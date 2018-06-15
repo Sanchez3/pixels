@@ -47,7 +47,7 @@ window.h5 = {
             ggroup.y = (600 - 6 / 8 * 600) / 2;
             app.stage.addChild(ggroup);
 
-            var pointerCir = new PIXI.Circle(0, 0, 100);
+            var pointerCir = new PIXI.Circle(0, 0, 10);
             ggroup.interactive = true;
             var dragging = false;
             ggroup.on('pointerdown', function() {
@@ -69,8 +69,15 @@ window.h5 = {
                     // console.log(newPosition)
                     pointerCir.x = newPosition.x;
                     pointerCir.y = newPosition.y;
+                    console.log(pointerCir.x,pointerCir.y)
+                    // containsG();
+                    for (var i = ggroup.children.length - 1; i >= 0; i--) {
 
-                    containsG();
+                        if (pointerCir.contains(ggroup.children[i].x, ggroup.children[i].y)) {
+                            // console.log(1234123)
+                            TweenMax.to(ggroup.children[i], 0.5, { alpha: 0 });
+                        }
+                    }
 
                 }
             });
@@ -130,8 +137,10 @@ window.h5 = {
             if (c.a !== 0) {
                 g.beginFill(parseInt(color16, 16), c.a);
                 var l = w1 * 2;
-                g.drawRect(x, y, l, l);
+                g.drawRect(0, 0, l, l);
                 g.endFill();
+                g.x=x;
+                g.y=y;
                 ggroup.addChild(g);
             }
         }
