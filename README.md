@@ -3,4 +3,5 @@
 
 ## References
 
-[Images and Pixels](https://processing.org/tutorials/pixels/)
+- [Images and Pixels](https://processing.org/tutorials/pixels/)
+
