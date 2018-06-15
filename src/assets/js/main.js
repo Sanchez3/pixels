@@ -11,7 +11,7 @@
 // import CSS
 // import animate_css from 'animate.css/animate.min.css';
 import css from '../css/css.css';
-
+import { TweenMax } from "gsap/TweenMax";
 // import Js Plugins/Entities
 
 //ES6 Module
@@ -22,6 +22,7 @@ import * as PIXI from 'pixi.js'
 
 window.h5 = {
     initCanvas: function() {
+        var ggroup;
         var wh = window.innerWidth;
         var ww = window.innerHeight;
         var app = new PIXI.Application();
@@ -32,20 +33,65 @@ window.h5 = {
         });
 
         function onStart() {
+            var w = 600;
+            // var h = 256;
+            var pixels = [];
             var ub = new PIXI.Sprite.fromImage('umbrella');
             // ub.x = app.screen.width / 2;
             // ub.y = app.screen.height / 2;
             // ub.anchor.set(0.5);
+            ub.alpha = 0;
             app.stage.addChild(ub);
+            ggroup = new PIXI.Container();
+            ggroup.x = 100;
+            ggroup.y = (600 - 6 / 8 * 600) / 2;
+            app.stage.addChild(ggroup);
+
+            var pointerCir = new PIXI.Circle(0, 0, 100);
+            ggroup.interactive = true;
+            var dragging = false;
+            ggroup.on('pointerdown', function() {
+                console.log('down');
+                dragging = true
+            });
+            ggroup.on('pointerup', onDragEnd)
+            ggroup.on('pointerupoutside', onDragEnd)
+
+            function onDragEnd() {
+                dragging = false;
+            }
+
+            ggroup.on('pointermove', function(e) {
+                if (dragging) {
+                    // console.log());
+                    console.log('Looks');
+                    var newPosition = e.data.getLocalPosition(this);
+                    // console.log(newPosition)
+                    pointerCir.x = newPosition.x;
+                    pointerCir.y = newPosition.y;
+
+                    containsG();
+
+                }
+            });
+
+            function containsG() {
+                // console.log(ggroup.children)
+
+                for (var i = ggroup.children.length - 1; i >= 0; i--) {
+                    if (pointerCir.contains(ggroup.children[i].x, ggroup.children[i].y)) {
+                        console.log(1234123)
+                        TweenMax.to(ggroup.children[i], 0.5, { alpha: 0 });
+                    }
+                }
+            }
 
             var pixelA = app.renderer.plugins.extract.pixels(ub);
             console.log(pixelA);
 
             console.log(ub.width, ub.height);
 
-            var w = 256;
-            // var h = 256;
-            var pixels = [];
+
 
             for (var i = 0; i < pixelA.length; i += 4) {
 
@@ -54,14 +100,14 @@ window.h5 = {
             }
             // console.log(pixels)
 
-            document.getElementById('canvas-wrapper').addEventListener('mousemove', function(event) {
-                var x = Math.round(event.clientX);
-                var y = Math.round(event.clientY);
-                document.getElementById('op').innerHTML = 'R: ' + pixels[y * ub.width + x].r + '<br>G: ' + pixels[y * ub.width + x].g + '<br>B: ' + pixels[y * ub.width + x].b + '<br>A: ' + pixels[y * ub.width + x].a;
+            // document.getElementById('canvas-wrapper').addEventListener('mousemove', function(event) {
+            //     var x = Math.round(event.clientX);
+            //     var y = Math.round(event.clientY);
+            //     document.getElementById('op').innerHTML = 'R: ' + pixels[y * ub.width + x].r + '<br>G: ' + pixels[y * ub.width + x].g + '<br>B: ' + pixels[y * ub.width + x].b + '<br>A: ' + pixels[y * ub.width + x].a;
 
-            })
-            for (var gridX = 0; gridX < ub.width; gridX+=5) {
-                for (var gridY = 0; gridY < ub.height; gridY+=5) {
+            // })
+            for (var gridX = 0; gridX < ub.width; gridX += 3) {
+                for (var gridY = 0; gridY < ub.height; gridY += 3) {
                     var tileWidth = w / ub.width;
                     var tileHeight = w / ub.height;
                     var posX = tileWidth * gridX;
@@ -81,11 +127,13 @@ window.h5 = {
         function drawG(x, y, w1, c) {
             var color16 = ('0' + c.r.toString(16)).slice(-2) + ('0' + c.g.toString(16)).slice(-2) + ('0' + c.b.toString(16)).slice(-2);
             var g = new PIXI.Graphics();
-            g.beginFill(parseInt(color16, 16), c.a);
-            var l = w1 * 2;
-            g.drawRect(x, y, l, l);
-            g.endFill();
-            app.stage.addChild(g);
+            if (c.a !== 0) {
+                g.beginFill(parseInt(color16, 16), c.a);
+                var l = w1 * 2;
+                g.drawRect(x, y, l, l);
+                g.endFill();
+                ggroup.addChild(g);
+            }
         }
 
         function _map(t, e, r, o, n) {
@@ -94,81 +142,6 @@ window.h5 = {
 
         }
 
-    },
-    isPc: function() {
-        var userAgentInfo = navigator.userAgent;
-        var Agents = new Array('Android', 'iPhone', 'SymbianOS', 'Windows Phone', 'iPad', 'iPod');
-        var flag = true;
-        for (var v = 0; v < Agents.length; v++) {
-            if (userAgentInfo.indexOf(Agents[v]) > 0) { flag = false; break; }
-        }
-        return flag;
-    },
-    rootResize: function() {
-        //orientation portrait width=750px height=1334px / WeChat width=750px height=1206px 
-        var wFsize;
-        //screen.width screen.height  bug !!!
-        // var wWidth = (screen.width > 0) ? (window.innerWidth >= screen.width || window.innerWidth == 0) ? screen.width :
-        //     window.innerWidth : window.innerWidth;
-        // var wHeight = (screen.height > 0) ? (window.innerHeight >= screen.height || window.innerHeight == 0) ?
-        //     screen.height : window.innerHeight : window.innerHeight;
-        var wWidth = window.innerWidth;
-        var wHeight = window.innerHeight;
-        if (wWidth > wHeight) {
-            wFsize = wHeight / 750 * 100;
-        } else {
-            wFsize = wWidth / 750 * 100;
-        }
-        document.getElementsByTagName('html')[0].style.fontSize = wFsize + 'px';
-    },
-    eventInit: function() {
-        var that = this;
-        document.addEventListener('touchstart', function(e) {}, false);
-        document.addEventListener('touchmove', function(e) {
-            e.preventDefault();
-        }, false);
-        return that;
-    },
-    cssInit: function() {
-        var that = this;
-        var noChangeCountToEnd = 100,
-            noEndTimeout = 1000;
-        that.rootResize();
-        window.addEventListener('onorientationchange' in window ? 'orientationchange' : 'resize', function() {
-            var interval,
-                timeout,
-                end,
-                lastInnerWidth,
-                lastInnerHeight,
-                noChangeCount;
-            end = function() {
-                // "orientationchangeend"
-                clearInterval(interval);
-                clearTimeout(timeout);
-                interval = null;
-                timeout = null;
-                that.rootResize();
-            };
-            interval = setInterval(function() {
-                if (window.innerWidth === lastInnerWidth && window.innerHeight === lastInnerHeight) {
-                    noChangeCount++;
-                    if (noChangeCount === noChangeCountToEnd) {
-                        // The interval resolved the issue first.
-                        end();
-                    }
-                } else {
-                    lastInnerWidth = window.innerWidth;
-                    lastInnerHeight = window.innerHeight;
-                    noChangeCount = 0;
-                }
-            });
-            timeout = setTimeout(function() {
-                // The timeout happened first.
-                end();
-            }, noEndTimeout);
-        });
-
-        return that;
     },
     init: function() {
         var that = this;
