@@ -44,35 +44,34 @@ window.h5 = {
             console.log(ub.width, ub.height);
 
             var w = 256;
-            var h = 256;
+            // var h = 256;
             var pixels = [];
 
             for (var i = 0; i < pixelA.length; i += 4) {
 
-                pixels.push({ r: pixelA[i], g: pixelA[i + 1], b: pixelA[i + 2], a: pixelA[i + 3] });
+                pixels.push({ r: pixelA[i], g: pixelA[i + 1], b: pixelA[i + 2], a: pixelA[i + 3] / 255 });
 
             }
             // console.log(pixels)
 
-             document.getElementById('canvas-wrapper').addEventListener('mousemove',function(event){
-                var x=Math.round(event.clientX);
-                var y=Math.round(event.clientY);
-                document.getElementById('op').innerHTML='R: ' + pixels[y*ub.width+x].r + '<br>G: ' + pixels[y*ub.width+x].g + '<br>B: ' + pixels[y*ub.width+x].b + '<br>A: ' + pixels[y*ub.width+x].a;
-            
+            document.getElementById('canvas-wrapper').addEventListener('mousemove', function(event) {
+                var x = Math.round(event.clientX);
+                var y = Math.round(event.clientY);
+                document.getElementById('op').innerHTML = 'R: ' + pixels[y * ub.width + x].r + '<br>G: ' + pixels[y * ub.width + x].g + '<br>B: ' + pixels[y * ub.width + x].b + '<br>A: ' + pixels[y * ub.width + x].a;
+
             })
-            for (var gridX = 0; gridX < ub.width; gridX++) {
-                for (var gridY = 0; gridY < ub.height; gridY++) {
+            for (var gridX = 0; gridX < ub.width; gridX+=5) {
+                for (var gridY = 0; gridY < ub.height; gridY+=5) {
                     var tileWidth = w / ub.width;
-                    var tileHeight = h / ub.height;
+                    var tileHeight = w / ub.height;
                     var posX = tileWidth * gridX;
-                    var posY = tileHeight * gridY;
+                    var posY = tileWidth * gridY;
                     var c = pixels[Math.ceil(gridY * ub.width + gridX)];
                     var greyscale = Math.round(c.r * 0.222 + c.g * 0.707 + c.b * 0.071);
                     var w1 = _map(greyscale, 0, 255, 15, 0.1);
                     // console.log(greyscale);
-                    var color16 = ('0' + c.r.toString(16)).slice(-2) + ('0' + c.g.toString(16)).slice(-2) + ('0' + c.b.toString(16)).slice(-2);
 
-                    drawG(posX, posY, 2, parseInt(color16, 16));
+                    drawG(posX, posY, 2, c);
 
                 }
             }
@@ -80,8 +79,9 @@ window.h5 = {
 
 
         function drawG(x, y, w1, c) {
+            var color16 = ('0' + c.r.toString(16)).slice(-2) + ('0' + c.g.toString(16)).slice(-2) + ('0' + c.b.toString(16)).slice(-2);
             var g = new PIXI.Graphics();
-            g.beginFill(c);
+            g.beginFill(parseInt(color16, 16), c.a);
             var l = w1 * 2;
             g.drawRect(x, y, l, l);
             g.endFill();
