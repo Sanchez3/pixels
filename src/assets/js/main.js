@@ -47,7 +47,7 @@ window.h5 = {
             ggroup.y = (600 - 6 / 8 * 600) / 2;
             app.stage.addChild(ggroup);
 
-            var pointerCir = new PIXI.Circle(0, 0, 10);
+            var pointerCir = new PIXI.Circle(0, 0, 20);
             ggroup.interactive = true;
             var dragging = false;
             ggroup.on('pointerdown', function() {
@@ -55,7 +55,7 @@ window.h5 = {
                 dragging = true
             });
             ggroup.on('pointerover', function() {
-                console.log('down');
+                console.log('over');
                 dragging = true
             });
             ggroup.on('pointerup', onDragEnd)
@@ -65,33 +65,38 @@ window.h5 = {
                 dragging = false;
             }
 
+
             ggroup.on('pointermove', function(e) {
                 if (dragging) {
-                    // console.log());
-                    console.log('Looks');
                     var newPosition = e.data.getLocalPosition(this);
-                    // console.log(newPosition)
                     pointerCir.x = newPosition.x;
                     pointerCir.y = newPosition.y;
-                    console.log(pointerCir.x, pointerCir.y)
-                    // containsG();
                     for (var i = ggroup.children.length - 1; i >= 0; i--) {
 
                         if (pointerCir.contains(ggroup.children[i].x, ggroup.children[i].y)) {
-                            // console.log(1234123)
-                            TweenMax.to(ggroup.children[i], 0.5, { alpha: 0, yoyo: true, repeat: 1 });
+                            TweenMax.to(ggroup.children[i], 0.5, {
+                                x: function() {
+                                    if (Math.random() > 0.5) {
+                                        return '+=3';
+                                    } else {
+                                        return '-=3';
+                                    }
+                                },
+                                yoyo: true,
+                                repeat: 1,
+                                ease: Bounce.easeInOut
+                            });
+
                         }
                     }
-
                 }
+
             });
 
             function containsG() {
-                // console.log(ggroup.children)
-
                 for (var i = ggroup.children.length - 1; i >= 0; i--) {
                     if (pointerCir.contains(ggroup.children[i].x, ggroup.children[i].y)) {
-    
+
                         TweenMax.to(ggroup.children[i], 0.5, { alpha: 0, yoyo: true, repeat: 1 });
                     }
                 }
@@ -167,24 +172,25 @@ window.onload = function() {
 
 //Stats JavaScript Performance Monitor
 
-//import Stats from 'stats.js';
-//showStats();
-// function showStats() {
-//     var stats = new Stats();
-//     stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-//     var fs = document.createElement('div');
-//     fs.style.position = 'absolute';
-//     fs.style.left = 0;
-//     fs.style.top = 0;
-//     fs.style.zIndex = 999;
-//     fs.appendChild(stats.domElement);
-//     document.body.appendChild(fs);
+import Stats from 'stats.js';
+showStats();
 
-//     function animate() {
-//         stats.begin();
-//         // monitored code goes here
-//         stats.end();
-//         requestAnimationFrame(animate);
-//     }
-//     requestAnimationFrame(animate);
-// }
+function showStats() {
+    var stats = new Stats();
+    stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+    var fs = document.createElement('div');
+    fs.style.position = 'absolute';
+    fs.style.left = 0;
+    fs.style.top = 0;
+    fs.style.zIndex = 999;
+    fs.appendChild(stats.domElement);
+    document.body.appendChild(fs);
+
+    function animate() {
+        stats.begin();
+        // monitored code goes here
+        stats.end();
+        requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+}
