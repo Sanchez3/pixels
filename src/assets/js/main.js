@@ -47,7 +47,7 @@ window.h5 = {
             ggroup.y = (600 - 6 / 8 * 600) / 2;
             app.stage.addChild(ggroup);
 
-            var pointerCir = new PIXI.Circle(0, 0, 20);
+            var pointerCir = new PIXI.Circle(0, 0, 100);
             ggroup.interactive = true;
             var dragging = false;
             ggroup.on('pointerdown', function() {
@@ -65,27 +65,41 @@ window.h5 = {
                 dragging = false;
             }
 
-
+            var gtween = [];
             ggroup.on('pointermove', function(e) {
                 if (dragging) {
                     var newPosition = e.data.getLocalPosition(this);
                     pointerCir.x = newPosition.x;
                     pointerCir.y = newPosition.y;
                     for (var i = ggroup.children.length - 1; i >= 0; i--) {
-
-                        if (pointerCir.contains(ggroup.children[i].x, ggroup.children[i].y)) {
-                            TweenMax.to(ggroup.children[i], 0.5, {
-                                x: function() {
-                                    if (Math.random() > 0.5) {
-                                        return '+=3';
-                                    } else {
-                                        return '-=3';
+                        if (pointerCir.contains(ggroup.children[i].x, ggroup.children[i].y) && !gtween[i]) {
+                            (function(i) {
+                                gtween[i] = TweenMax.to(ggroup.children[i], 0.5, {
+                                    x: function() {
+                                        if (Math.random() > 0.5) {
+                                            return '+=3';
+                                        } else {
+                                            return '-=3';
+                                        }
+                                    },
+                                    y: function() {
+                                        if (Math.random() > 0.5) {
+                                            return '+=3';
+                                        } else {
+                                            return '-=3';
+                                        }
+                                    },
+                                    yoyo: true,
+                                    repeat: 1,
+                                    delay: Math.random() * 2,
+                                    // ease: Bounce.easeInOut,
+                                    onComplete: function() {
+                                        gtween[i] = 0;
+                                        // console.log(gtween)
                                     }
-                                },
-                                yoyo: true,
-                                repeat: 1,
-                                ease: Bounce.easeInOut
-                            });
+                                });
+                            })(i)
+
 
                         }
                     }
