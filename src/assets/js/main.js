@@ -15,8 +15,6 @@ import { TweenMax } from "gsap/TweenMax";
 // import Js Plugins/Entities
 
 //ES6 Module
-import Bar1 from './entities/Bar1';
-
 
 import * as PIXI from 'pixi.js'
 
