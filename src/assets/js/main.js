@@ -132,7 +132,6 @@ window.h5 = {
             //     var x = Math.round(event.clientX);
             //     var y = Math.round(event.clientY);
             //     document.getElementById('op').innerHTML = 'R: ' + pixels[y * ub.width + x].r + '<br>G: ' + pixels[y * ub.width + x].g + '<br>B: ' + pixels[y * ub.width + x].b + '<br>A: ' + pixels[y * ub.width + x].a;
-
             // })
             for (var gridX = 0; gridX < ub.width; gridX += 3) {
                 for (var gridY = 0; gridY < ub.height; gridY += 3) {
