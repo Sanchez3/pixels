@@ -31,7 +31,7 @@ window.h5 = {
         });
 
         function onStart() {
-            var w = 600;
+            var w = 400;
             // var h = 256;
             var pixels = [];
             var ub = new PIXI.Sprite.fromImage('umbrella');
@@ -133,8 +133,8 @@ window.h5 = {
             //     var y = Math.round(event.clientY);
             //     document.getElementById('op').innerHTML = 'R: ' + pixels[y * ub.width + x].r + '<br>G: ' + pixels[y * ub.width + x].g + '<br>B: ' + pixels[y * ub.width + x].b + '<br>A: ' + pixels[y * ub.width + x].a;
             // })
-            for (var gridX = 0; gridX < ub.width; gridX += 3) {
-                for (var gridY = 0; gridY < ub.height; gridY += 3) {
+            for (var gridX = 0; gridX < ub.width; gridX += 4) {
+                for (var gridY = 0; gridY < ub.height; gridY += 4) {
                     var tileWidth = w / ub.width;
                     var tileHeight = w / ub.height;
                     var posX = tileWidth * gridX;
@@ -156,7 +156,7 @@ window.h5 = {
             var g = new PIXI.Graphics();
             if (c.a !== 0) {
                 g.beginFill(parseInt(color16, 16), c.a);
-                var l = w1 * 2;
+                var l = w1 * 3;
                 g.drawRect(0, 0, l, l);
                 g.endFill();
                 g.x = x;
