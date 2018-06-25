@@ -21,6 +21,7 @@ import * as PIXI from 'pixi.js'
 window.h5 = {
     initCanvas: function() {
         var pcontainer;
+        var pgraphics;
         var wh = window.innerWidth;
         var ww = window.innerHeight;
         var app = new PIXI.Application({ forceCanvas: false, resolution: window.devicePixelRatio });
@@ -44,12 +45,13 @@ window.h5 = {
             ub.alpha = 0;
             app.stage.addChild(ub);
 
-            pcontainer = new PIXI.particles.ParticleContainer(200000, { alpha: false });
-            // pcontainer = new PIXI.Container();
+            // pcontainer = new PIXI.particles.ParticleContainer(20000, { alpha: false });
+            pcontainer = new PIXI.Container();
 
             pcontainer.x = 100;
             pcontainer.y = (600 - 6 / 8 * 600) / 2;
             app.stage.addChild(pcontainer);
+            // pgraphics = new PIXI.Graphics();
 
             var pointerCir = new PIXI.Circle(0, 0, 100);
             pcontainer.interactive = true;
@@ -140,15 +142,15 @@ window.h5 = {
                     var c = pixels[Math.ceil(gridY * ub.width + gridX)];
                     var greyscale = Math.round(c.r * 0.222 + c.g * 0.707 + c.b * 0.071);
                     var w1 = _map(greyscale, 0, 255, 15, 0.1);
-                    // drawG(posX, posY, 2 ,c);
-                    var graphic = makeParticleGraphic(w1, c);
-                    if (graphic) {
-                        var texture = app.renderer.generateTexture(graphic);
-                        var spriteParticle = new PIXI.Sprite(texture);
-                        spriteParticle.x = posX;
-                        spriteParticle.y = posY;
-                        pcontainer.addChild(spriteParticle);
-                    }
+                    drawG(posX, posY, 2 ,c);
+                    // var graphic = makeParticleGraphic(w1, c);
+                    // if (graphic) {
+                    //     var texture = app.renderer.generateTexture(graphic);
+                    //     var spriteParticle = new PIXI.Sprite(texture);
+                    //     spriteParticle.x = posX;
+                    //     spriteParticle.y = posY;
+                    //     pcontainer.addChild(spriteParticle);
+                    // }
                 }
             }
         }
@@ -156,18 +158,19 @@ window.h5 = {
         function makeParticleGraphic(w1, c) {
             var color16 = ('0' + c.r.toString(16)).slice(-2) + ('0' + c.g.toString(16)).slice(-2) + ('0' + c.b.toString(16)).slice(-2);
             if (c.a !== 0) {
-                var g = new PIXI.Graphics();
-                g.beginFill(parseInt(color16, 16));
+                // var g = new PIXI.Graphics();
+                pgraphics.clear();
+                pgraphics.beginFill(parseInt(color16, 16));
                 var l = w1 * 1;
-                g.drawRect(0, 0, l, l);
-                g.endFill();
+                pgraphics.drawRect(0, 0, l, l);
+                pgraphics.endFill();
 
                 //  g.beginFill(0xfff);
                 // var l = 2 * 1;
                 // g.drawRect(0, 0, l, l);
                 // g.endFill();
 
-                return g;
+                return pgraphics;
             } else return 0;
         }
 
