@@ -15,7 +15,7 @@
   - [phaser.js examples](http://phaser.io/examples/v2/search?search=pixel)
   - [DNA](http://jonathanbobrow.com/loadr/loadr_mult.html)
   - [Particle PIXI](http://codepen.io/lonelydatum/pen/eggEje?editors=0010#0) 
-  
+
 
 ## References
 
