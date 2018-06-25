@@ -21,7 +21,7 @@ import * as PIXI from 'pixi.js'
 window.h5 = {
     initCanvas: function() {
         var pcontainer;
-        var pgraphics;
+        var particlecontainer;
         var wh = window.innerWidth;
         var ww = window.innerHeight;
         var app = new PIXI.Application({ forceCanvas: false, resolution: window.devicePixelRatio });
@@ -45,7 +45,7 @@ window.h5 = {
             ub.alpha = 0;
             app.stage.addChild(ub);
 
-            // pcontainer = new PIXI.particles.ParticleContainer(20000, { alpha: false });
+            particlecontainer = new PIXI.particles.ParticleContainer(20000, { alpha: false });
             pcontainer = new PIXI.Container();
 
             pcontainer.x = 100;
@@ -58,11 +58,11 @@ window.h5 = {
             var dragging = false;
             pcontainer.on('pointerdown', function() {
                 console.log('down');
-                dragging = true
+                dragging = true;
             });
             pcontainer.on('pointerover', function() {
                 console.log('over');
-                dragging = true
+                dragging = true;
             });
             pcontainer.on('pointerup', onDragEnd)
             pcontainer.on('pointerupoutside', onDragEnd)
@@ -115,11 +115,6 @@ window.h5 = {
 
 
             var pixelA = app.renderer.plugins.extract.pixels(ub);
-            console.log(pixelA);
-
-            console.log(ub.width, ub.height);
-
-
 
             for (var i = 0; i < pixelA.length; i += 4) {
 
@@ -145,11 +140,11 @@ window.h5 = {
                     drawG(posX, posY, 2 ,c);
                     // var graphic = makeParticleGraphic(w1, c);
                     // if (graphic) {
-                    //     var texture = app.renderer.generateTexture(graphic);
-                    //     var spriteParticle = new PIXI.Sprite(texture);
+                        // var texture = app.renderer.generateTexture(pcontainer);
+                        // var spriteParticle = new PIXI.Sprite(texture);
                     //     spriteParticle.x = posX;
                     //     spriteParticle.y = posY;
-                    //     pcontainer.addChild(spriteParticle);
+                        // app.stage.addChild(spriteParticle);
                     // }
                 }
             }
