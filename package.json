@@ -30,6 +30,7 @@
     },
     "dependencies": {
         "@fdaciuk/ajax": "^2.3.0",
+        "@pixi/filter-pixelate": "^2.5.0",
         "animate.css": "^3.5.2",
         "gsap": "^1.20.3",
         "howler": "^2.0.5",
