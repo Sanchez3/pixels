@@ -16,15 +16,7 @@ body {
   left: 0;
   top: 0;
 }
-#op{
-  position: absolute;
-  left: 0;
-  top: 0;
-  text-align: left;
-  font-size: 20px;
-  color: #FFFFFF;
-  
-}
+
 /*canvas {
   display: block;
   cursor: none;
