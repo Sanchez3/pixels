@@ -59,7 +59,18 @@ window.h5 = {
 
         function useFilter() {
             pcontainer.addChild(sprite);
-            pcontainer.filters = [new PixelateFilter(2)];
+            var pixelate = new PixelateFilter(1);
+            pcontainer.filters = [pixelate];
+            console.log(pixelate)
+            var v = { n: 10 };
+            TweenMax.to(v, 1, {
+                n: 1,
+                onUpdate: function() {
+                    pcontainer.filters = [new PixelateFilter(v.n)];
+                },
+                repeat: -1,
+                yoyo: true
+            })
         }
 
         function useGraphic() {
