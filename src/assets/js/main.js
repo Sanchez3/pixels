@@ -20,12 +20,15 @@ import * as PIXI from 'pixi.js'
 
 window.h5 = {
     initCanvas: function() {
-        var ggroup;
+        var pcontainer;
         var wh = window.innerWidth;
         var ww = window.innerHeight;
-        var app = new PIXI.Application();
+        var app = new PIXI.Application({ forceCanvas: false, resolution: window.devicePixelRatio });
         document.getElementById('canvas-wrapper').appendChild(app.view);
-        PIXI.loader.add('umbrella', './assets/img/umbrella.png').load(onStart);
+        PIXI.loader
+            .add('umbrella', './assets/img/umbrella.png')
+            .add('sample1', './assets/img/sample1.png')
+            .load(onStart);
         app.ticker.add(function() {
             app.render(app.stage);
         });
@@ -34,45 +37,48 @@ window.h5 = {
             var w = 400;
             // var h = 256;
             var pixels = [];
-            var ub = new PIXI.Sprite.fromImage('umbrella');
+            var ub = new PIXI.Sprite.fromImage('sample1');
             // ub.x = app.screen.width / 2;
             // ub.y = app.screen.height / 2;
             // ub.anchor.set(0.5);
             ub.alpha = 0;
             app.stage.addChild(ub);
-            ggroup = new PIXI.Container();
-            ggroup.x = 100;
-            ggroup.y = (600 - 6 / 8 * 600) / 2;
-            app.stage.addChild(ggroup);
+
+            pcontainer = new PIXI.particles.ParticleContainer(200000, { alpha: false });
+            // pcontainer = new PIXI.Container();
+
+            pcontainer.x = 100;
+            pcontainer.y = (600 - 6 / 8 * 600) / 2;
+            app.stage.addChild(pcontainer);
 
             var pointerCir = new PIXI.Circle(0, 0, 100);
-            ggroup.interactive = true;
+            pcontainer.interactive = true;
             var dragging = false;
-            ggroup.on('pointerdown', function() {
+            pcontainer.on('pointerdown', function() {
                 console.log('down');
                 dragging = true
             });
-            ggroup.on('pointerover', function() {
+            pcontainer.on('pointerover', function() {
                 console.log('over');
                 dragging = true
             });
-            ggroup.on('pointerup', onDragEnd)
-            ggroup.on('pointerupoutside', onDragEnd)
+            pcontainer.on('pointerup', onDragEnd)
+            pcontainer.on('pointerupoutside', onDragEnd)
 
             function onDragEnd() {
                 dragging = false;
             }
 
             var gtween = [];
-            ggroup.on('pointermove', function(e) {
+            pcontainer.on('pointermove', function(e) {
                 if (dragging) {
                     var newPosition = e.data.getLocalPosition(this);
                     pointerCir.x = newPosition.x;
                     pointerCir.y = newPosition.y;
-                    for (var i = ggroup.children.length - 1; i >= 0; i--) {
-                        if (pointerCir.contains(ggroup.children[i].x, ggroup.children[i].y) && !gtween[i]) {
+                    for (var i = pcontainer.children.length - 1; i >= 0; i--) {
+                        if (pointerCir.contains(pcontainer.children[i].x, pcontainer.children[i].y) && !gtween[i]) {
                             (function(i) {
-                                gtween[i] = TweenMax.to(ggroup.children[i], 0.5, {
+                                gtween[i] = TweenMax.to(pcontainer.children[i], 0.5, {
                                     x: function() {
                                         if (Math.random() > 0.5) {
                                             return '+=3';
@@ -105,14 +111,6 @@ window.h5 = {
 
             });
 
-            function containsG() {
-                for (var i = ggroup.children.length - 1; i >= 0; i--) {
-                    if (pointerCir.contains(ggroup.children[i].x, ggroup.children[i].y)) {
-
-                        TweenMax.to(ggroup.children[i], 0.5, { alpha: 0, yoyo: true, repeat: 1 });
-                    }
-                }
-            }
 
             var pixelA = app.renderer.plugins.extract.pixels(ub);
             console.log(pixelA);
@@ -133,8 +131,8 @@ window.h5 = {
             //     var y = Math.round(event.clientY);
             //     document.getElementById('op').innerHTML = 'R: ' + pixels[y * ub.width + x].r + '<br>G: ' + pixels[y * ub.width + x].g + '<br>B: ' + pixels[y * ub.width + x].b + '<br>A: ' + pixels[y * ub.width + x].a;
             // })
-            for (var gridX = 0; gridX < ub.width; gridX += 4) {
-                for (var gridY = 0; gridY < ub.height; gridY += 4) {
+            for (var gridX = 0; gridX < ub.width; gridX += 2) {
+                for (var gridY = 0; gridY < ub.height; gridY += 2) {
                     var tileWidth = w / ub.width;
                     var tileHeight = w / ub.height;
                     var posX = tileWidth * gridX;
@@ -142,33 +140,53 @@ window.h5 = {
                     var c = pixels[Math.ceil(gridY * ub.width + gridX)];
                     var greyscale = Math.round(c.r * 0.222 + c.g * 0.707 + c.b * 0.071);
                     var w1 = _map(greyscale, 0, 255, 15, 0.1);
-                    // console.log(greyscale);
-
-                    drawG(posX, posY, 2, c);
-
+                    // drawG(posX, posY, 2 ,c);
+                    var graphic = makeParticleGraphic(w1, c);
+                    if (graphic) {
+                        var texture = app.renderer.generateTexture(graphic);
+                        var spriteParticle = new PIXI.Sprite(texture);
+                        spriteParticle.x = posX;
+                        spriteParticle.y = posY;
+                        pcontainer.addChild(spriteParticle);
+                    }
                 }
             }
         }
 
+        function makeParticleGraphic(w1, c) {
+            var color16 = ('0' + c.r.toString(16)).slice(-2) + ('0' + c.g.toString(16)).slice(-2) + ('0' + c.b.toString(16)).slice(-2);
+            if (c.a !== 0) {
+                var g = new PIXI.Graphics();
+                g.beginFill(parseInt(color16, 16));
+                var l = w1 * 1;
+                g.drawRect(0, 0, l, l);
+                g.endFill();
+
+                //  g.beginFill(0xfff);
+                // var l = 2 * 1;
+                // g.drawRect(0, 0, l, l);
+                // g.endFill();
+
+                return g;
+            } else return 0;
+        }
 
         function drawG(x, y, w1, c) {
             var color16 = ('0' + c.r.toString(16)).slice(-2) + ('0' + c.g.toString(16)).slice(-2) + ('0' + c.b.toString(16)).slice(-2);
             var g = new PIXI.Graphics();
             if (c.a !== 0) {
                 g.beginFill(parseInt(color16, 16), c.a);
-                var l = w1 * 3;
+                var l = w1 * 2;
                 g.drawRect(0, 0, l, l);
                 g.endFill();
                 g.x = x;
                 g.y = y;
-                ggroup.addChild(g);
+                pcontainer.addChild(g);
             }
         }
 
         function _map(t, e, r, o, n) {
-
             return (t - e) / (r - e) * (n - o) + o;
-
         }
 
     },
