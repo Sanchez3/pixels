@@ -12,6 +12,8 @@
 // import animate_css from 'animate.css/animate.min.css';
 import css from '../css/css.css';
 import { TweenMax } from "gsap/TweenMax";
+
+import { PixelateFilter } from '@pixi/filter-pixelate';
 // import Js Plugins/Entities
 
 //ES6 Module
@@ -22,6 +24,7 @@ window.h5 = {
     initCanvas: function() {
         var pcontainer;
         var particlecontainer;
+        var sprite;
         var wh = window.innerWidth;
         var ww = window.innerHeight;
         var app = new PIXI.Application({ forceCanvas: false, resolution: window.devicePixelRatio });
@@ -35,27 +38,43 @@ window.h5 = {
         });
 
         function onStart() {
-            var w = 400;
-            // var h = 256;
-            var pixels = [];
-            var ub = new PIXI.Sprite.fromImage('sample1');
-            // ub.x = app.screen.width / 2;
-            // ub.y = app.screen.height / 2;
-            // ub.anchor.set(0.5);
-            ub.alpha = 0;
-            app.stage.addChild(ub);
-
-            particlecontainer = new PIXI.particles.ParticleContainer(20000, { alpha: false });
+            sprite = new PIXI.Sprite.fromImage('sample1');
+            // sprite.x = app.screen.width / 2;
+            // sprite.y = app.screen.height / 2;
+            // sprite.anchor.set(0.5);
+            app.stage.addChild(sprite);
             pcontainer = new PIXI.Container();
-
+            particlecontainer = new PIXI.particles.ParticleContainer(20000, { alpha: false });
             pcontainer.x = 100;
             pcontainer.y = (600 - 6 / 8 * 600) / 2;
             app.stage.addChild(pcontainer);
             // pgraphics = new PIXI.Graphics();
+            // useGraphic();
+            useFilter();
 
+
+
+
+        }
+
+        function useFilter() {
+            pcontainer.addChild(sprite);
+            pcontainer.filters = [new PixelateFilter(2)];
+        }
+
+        function useGraphic() {
+            sprite.alpha = 0;
+            var w = 400;
             var pointerCir = new PIXI.Circle(0, 0, 100);
             pcontainer.interactive = true;
             var dragging = false;
+            var pixels = [];
+            var pixelA = app.renderer.plugins.extract.pixels(sprite);
+
+            for (var i = 0; i < pixelA.length; i += 4) {
+
+                pixels.push({ r: pixelA[i], g: pixelA[i + 1], b: pixelA[i + 2], a: pixelA[i + 3] / 255 });
+            }
             pcontainer.on('pointerdown', function() {
                 console.log('down');
                 dragging = true;
@@ -110,41 +129,25 @@ window.h5 = {
                         }
                     }
                 }
-
             });
-
-
-            var pixelA = app.renderer.plugins.extract.pixels(ub);
-
-            for (var i = 0; i < pixelA.length; i += 4) {
-
-                pixels.push({ r: pixelA[i], g: pixelA[i + 1], b: pixelA[i + 2], a: pixelA[i + 3] / 255 });
-
-            }
-            // console.log(pixels)
-
-            // document.getElementById('canvas-wrapper').addEventListener('mousemove', function(event) {
-            //     var x = Math.round(event.clientX);
-            //     var y = Math.round(event.clientY);
-            //     document.getElementById('op').innerHTML = 'R: ' + pixels[y * ub.width + x].r + '<br>G: ' + pixels[y * ub.width + x].g + '<br>B: ' + pixels[y * ub.width + x].b + '<br>A: ' + pixels[y * ub.width + x].a;
-            // })
-            for (var gridX = 0; gridX < ub.width; gridX += 2) {
-                for (var gridY = 0; gridY < ub.height; gridY += 2) {
-                    var tileWidth = w / ub.width;
-                    var tileHeight = w / ub.height;
+            // make Graphic
+            for (var gridX = 0; gridX < sprite.width; gridX += 2) {
+                for (var gridY = 0; gridY < sprite.height; gridY += 2) {
+                    var tileWidth = w / sprite.width;
+                    var tileHeight = w / sprite.height;
                     var posX = tileWidth * gridX;
                     var posY = tileWidth * gridY;
-                    var c = pixels[Math.ceil(gridY * ub.width + gridX)];
+                    var c = pixels[Math.ceil(gridY * sprite.width + gridX)];
                     var greyscale = Math.round(c.r * 0.222 + c.g * 0.707 + c.b * 0.071);
                     var w1 = _map(greyscale, 0, 255, 15, 0.1);
-                    drawG(posX, posY, 2 ,c);
+                    drawG(posX, posY, 2, c);
                     // var graphic = makeParticleGraphic(w1, c);
                     // if (graphic) {
-                        // var texture = app.renderer.generateTexture(pcontainer);
-                        // var spriteParticle = new PIXI.Sprite(texture);
+                    // var texture = app.renderer.generateTexture(pcontainer);
+                    // var spriteParticle = new PIXI.Sprite(texture);
                     //     spriteParticle.x = posX;
                     //     spriteParticle.y = posY;
-                        // app.stage.addChild(spriteParticle);
+                    // app.stage.addChild(spriteParticle);
                     // }
                 }
             }
