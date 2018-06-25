@@ -61,12 +61,12 @@ window.h5 = {
             pcontainer.addChild(sprite);
             var pixelate = new PixelateFilter(1);
             pcontainer.filters = [pixelate];
-            console.log(pixelate)
-            var v = { n: 10 };
-            TweenMax.to(v, 1, {
+            console.log(pcontainer.filters[0].uniforms['size'])
+            var v = { n: 100 };
+            TweenMax.to(v, 5, {
                 n: 1,
                 onUpdate: function() {
-                    pcontainer.filters = [new PixelateFilter(v.n)];
+                    pcontainer.filters[0].uniforms['size'] = [v.n, v.n];
                 },
                 repeat: -1,
                 yoyo: true
