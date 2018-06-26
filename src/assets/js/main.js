@@ -38,39 +38,73 @@ window.h5 = {
         });
 
         function onStart() {
-            sprite = new PIXI.Sprite.fromImage('sprite1');
-            // sprite.x = app.screen.width / 2;
-            // sprite.y = app.screen.height / 2;
-            // sprite.anchor.set(0.5);
-            app.stage.addChild(sprite);
+
             pcontainer = new PIXI.Container();
             particlecontainer = new PIXI.particles.ParticleContainer(20000, { alpha: false });
             pcontainer.x = 100;
             pcontainer.y = (600 - 6 / 8 * 600) / 2;
             app.stage.addChild(pcontainer);
+
+            sprite = new PIXI.Sprite.fromImage('sprite1');
+            pcontainer.addChild(sprite);
             // pgraphics = new PIXI.Graphics();
             // useGraphic();
             useFilter();
-
-
-
-
         }
 
         function useFilter() {
-            pcontainer.addChild(sprite);
-            var pixelate = new PixelateFilter(1);
-            pcontainer.filters = [pixelate];
-            console.log(pcontainer.filters[0].uniforms['size'])
+            var dragging = false;
+            var maskSpeed = 0.1;
+            var mask = new PIXI.Graphics();
+            mask.beginFill(0xFFF, 1).drawCircle(0, 0, 100).endFill();
+            app.stage.addChild(mask);
+
+            var msprite = new PIXI.Sprite.fromImage('sprite1');
+            var pixelate = new PixelateFilter(5);
+            msprite.filters = [pixelate];
+            msprite.mask = mask;
+            pcontainer.addChild(msprite);
+
+            var maskPosition = mask.position;
+            var pointer = new PIXI.Point(pcontainer.width / 2, pcontainer.height / 2);
+
             var v = { n: 100 };
-            TweenMax.to(v, 5, {
-                n: 1,
-                onUpdate: function() {
-                    pcontainer.filters[0].uniforms['size'] = [v.n, v.n];
-                },
-                repeat: -1,
-                yoyo: true
-            })
+            // TweenMax.to(v, 5, {
+            //     n: 1,
+            //     onUpdate: function() {
+            //         msprite.filters[0].uniforms['size'] = [v.n, v.n];
+            //     },
+            //     repeat: -1,
+            //     yoyo: true
+            // });
+            var updatePosition = true;
+            pcontainer.interactive = true;
+
+            function onPointerMove(eventData) {
+                pointer.copy(eventData.data.global);
+                updatePosition = true;
+            }
+            pcontainer.on('pointerdown', onPointerMove);
+            pcontainer.on('pointermove', onPointerMove);
+
+            app.ticker.add(onTick);
+
+            function onTick(delta) {
+                if (updatePosition) {
+                    var dx = pointer.x - maskPosition.x;
+                    var dy = pointer.y - maskPosition.y;
+                    if (Math.abs(dx) < 0.05 && Math.abs(dy) < 0.05) {
+                        maskPosition.copy(pointer);
+                        updatePosition = false;
+                    } else {
+                        var dt = 1 - Math.pow(1 - maskSpeed, delta);
+                        maskPosition.x += dx * dt;
+                        maskPosition.y += dy * dt;
+                    }
+                }
+            }
+
+
         }
 
         function useGraphic() {
