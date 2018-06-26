@@ -31,14 +31,14 @@ window.h5 = {
         document.getElementById('canvas-wrapper').appendChild(app.view);
         PIXI.loader
             .add('umbrella', './assets/img/umbrella.png')
-            .add('sample1', './assets/img/sample1.png')
+            .add('sprite1', './assets/img/sprite1.png')
             .load(onStart);
         app.ticker.add(function() {
             app.render(app.stage);
         });
 
         function onStart() {
-            sprite = new PIXI.Sprite.fromImage('sample1');
+            sprite = new PIXI.Sprite.fromImage('sprite1');
             // sprite.x = app.screen.width / 2;
             // sprite.y = app.screen.height / 2;
             // sprite.anchor.set(0.5);
